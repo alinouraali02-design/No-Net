@@ -1,0 +1,40 @@
+name: Build No Net APKs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download source
+        uses: actions/checkout@v4
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build No Net
+        run: |
+          cd NoNet
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Build No Net Admin
+        run: |
+          cd NoNet_Admin
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Save APK files
+        uses: actions/upload-artifact@v4
+        with:
+          name: NoNet-APKs
+          path: |
+            NoNet/app/build/outputs/apk/debug/*.apk
+            NoNet_Admin/app/build/outputs/apk/debug/*.apk
